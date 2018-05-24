@@ -1,6 +1,5 @@
 package Stock;
 
-import GUI.CSVFormatException;
 import GUI.StockException;
 
 /**

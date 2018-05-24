@@ -20,7 +20,7 @@ import Stock.Stock;
  *
  */
 
-class RefrigeratedTruckTest {
+public class RefrigeratedTruckTest {
 
 	Stock cargo = new Stock();
 	RefrigeratedTruck truck;
@@ -33,13 +33,13 @@ class RefrigeratedTruckTest {
 	
 
 	@Test
-	void testGetCapacity() {
+	public void testGetCapacity() {
 		truck = new RefrigeratedTruck(cargo);
 		assertEquals(800, truck.getCapacity());
 	}
 	
 	@Test
-	void testGetTemperature() throws StockException {
+	public void testGetTemperature() throws StockException {
 		Item rice = new Item(itemRice);
 		Item cake = new Item(itemCake);
 		Item boogers = new Item(itemBoogers);
@@ -62,7 +62,7 @@ class RefrigeratedTruckTest {
 	
 	
 	@Test
-	void testGetCost() throws StockException {
+	public void testGetCost() throws StockException {
 		Item rice = new Item(itemRice);
 		Item cake = new Item(itemCake);
 		Item boogers = new Item(itemBoogers);
@@ -75,12 +75,12 @@ class RefrigeratedTruckTest {
 		
 		double cost = 900 + 200 * Math.pow(0.7, -10/5.0);
 		
-		assertEquals(cost, truck.getCost());
+		assertEquals(cost, truck.getCost(), 0.0);
 	}
 
 	
 	@Test 
-	void testGetCargo() throws CSVFormatException, StockException {
+	public void testGetCargo() throws CSVFormatException, StockException {
 		
 		Item rice = new Item(itemRice);
 		Item cake = new Item(itemCake);

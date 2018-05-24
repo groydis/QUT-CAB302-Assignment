@@ -42,7 +42,7 @@ public class RefrigeratedTruck extends Truck {
 	
 	/**
 	 * Sets the trucks temperature based on the inventory.
-	 * Checks to see which item requires the lowest colling and sets the temperature as that value.
+	 * Checks to see which item requires the lowest temp and sets the temperature as that value.
 	 * 
 	 */
 	public void setTemperature() {
