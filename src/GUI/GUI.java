@@ -30,6 +30,16 @@ public class GUI extends JFrame implements ActionListener
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;
 	
+	//The File Name of particular files
+	public static String itemPropertiesFileName;
+	public static String importManifestFileName;
+	public static String exportManifestFileName;
+	public static String salesLogFileName;
+	
+	private static Stock storeInventory;
+	private static Stock itemsToOrder;
+	private static Store store;
+	private static Manifest manifest;
 	
 	
 	
@@ -222,7 +232,11 @@ public class GUI extends JFrame implements ActionListener
 			int returnVal = itemPropertiesChooser.showOpenDialog(GUI.this);
 
 		      if (returnVal == JFileChooser.APPROVE_OPTION) {
-		    	  
+		    	File file = itemPropertiesChooser.getSelectedFile();
+		        itemPropertiesFileName = file.getAbsolutePath();
+		        itemPropertiesTextArea.setText("");
+		        itemPropertiesTextArea.append(itemPropertiesFileName);
+			      
 		        
 		      }
 		}
@@ -230,62 +244,132 @@ public class GUI extends JFrame implements ActionListener
 		else if (action.getSource() == exportManifestChooseButton) {
 		      int returnVal = exportManifestChooser.showSaveDialog(GUI.this);
 		      if (returnVal == JFileChooser.APPROVE_OPTION) {
-		        
+				File file = exportManifestChooser.getSelectedFile();
+				exportManifestFileName = file.getAbsolutePath();
+				exportManifestTextArea.setText("");
+				exportManifestTextArea.append(exportManifestFileName);
+			      
 		      }
 		}
 		else if (action.getSource() == importManifestChooseButton) {
 			int returnVal = importManifestChooser.showOpenDialog(GUI.this);
 
 		      if (returnVal == JFileChooser.APPROVE_OPTION) {
-		        
+		    	File file = importManifestChooser.getSelectedFile();
+		        importManifestFileName = file.getAbsolutePath();
+		        importManifestTextArea.setText("");
+		        importManifestTextArea.append(importManifestFileName);
+			      
 		      }
 		}
 		else if (action.getSource() == salesLogChooseButton) {
 			int returnVal = salesLogChooser.showOpenDialog(GUI.this);
 
 		      if (returnVal == JFileChooser.APPROVE_OPTION) {
-		        
+		    	File file = salesLogChooser.getSelectedFile();
+		        salesLogFileName = file.getAbsolutePath();
+		        salesLogTextArea.setText("");
+		        salesLogTextArea.append(salesLogFileName);
 		      }
 		} 
 		else if (action.getSource() == itemPropertiesButton) {
 			if (itemPropertiesTextArea.getText().trim().length() != 0) {
+				try {
+					FileManager.ImportItemProperties(itemPropertiesTextArea.getText(), storeInventory);
 				
+					itemsToOrder =  new Stock();
+					for (Item item: storeInventory.getItems()) {
+						if (item.reorder()) {
+							for (int i = 0; i < item.getReorderAmount(); i++) {
+								itemsToOrder.addItem(item);
+							}
+						}
+					}
 					
 					
-				DefaultTableModel dtm = new DefaultTableModel(0, 0);
-				dtm.addColumn("Name");
-				dtm.addColumn("Manufacturing Cost");
-				dtm.addColumn("Price");
-				dtm.addColumn("Reorder Point");
-				dtm.addColumn("Reorder Amount");
-				dtm.addColumn("Storage Temp");
-				dtm.addColumn("Quantity");
-				
-				dtm.addRow(new Object[] {"Name", "Cost", "Price", "Reorder Point", "Reorder Amount", "Temperature", "Quantity"});
-				
-				
-				
-				inventoryTable.setModel(dtm);
-				
+					DefaultTableModel dtm = new DefaultTableModel(0, 0);
+					dtm.addColumn("Name");
+					dtm.addColumn("Manufacturing Cost");
+					dtm.addColumn("Price");
+					dtm.addColumn("Reorder Point");
+					dtm.addColumn("Reorder Amount");
+					dtm.addColumn("Storage Temp");
+					dtm.addColumn("Quantity");
+					
+					dtm.addRow(new Object[] {"Name", "Cost", "Price", "Reorder Point", "Reorder Amount", "Temperature", "Quantity"});
+					
+					for (Item item: storeInventory.getItems()) {
+						dtm.addRow(new Object[] { item.getName(), item.getManufacturingCost(), item.getSellPrice(),
+								item.getReorderpoint(), item.getReorderAmount(), item.getStorageTemp(), item.getQuantity() });
+					}
+					
+					inventoryTable.setModel(dtm);
+				} catch (IOException e) {
+					ShowError("Import Items Properties Error", e.toString());
+					
+				} catch (CSVFormatException e) {
+					ShowError("Import Items Properties Error", e.toString());
+					
+				} catch (StockException e) {
+					ShowError("Import Items Properties Error", e.toString());
+				}
 
+			} else {
+				ShowError("Import Items Properties Error", "No file Selected");
 			}
+			storeCapitalLabel.setText("$" + store.capitalToString());
 			
 		}
 		else if (action.getSource() == importManifestButton) {
 			if (importManifestTextArea.getText().trim().length() != 0) {
-
-			} 
+				try {
+					FileManager.LoadManifest(importManifestTextArea.getText(), storeInventory, store);
+				
+					int index = 1;
+					for (Item item : storeInventory.getItems()) {
+						inventoryTable.getModel().setValueAt(item.getQuantity(), index, 6);
+						index++;
+					}
+					storeCapitalLabel.setText("$" + store.capitalToString());
+				} catch (DeliveryException e) {
+					ShowError("Import Manifest Error", e.toString());
+				}
+			} else {
+				ShowError("Import Manifest Error", "No file Selected");
+			}
 			
 		}
 		else if (action.getSource() == exportManifestButton) {
 			if (exportManifestTextArea.getText().trim().length() != 0) {
-
+			try {
+					FileManager.ExportManifest(exportManifestTextArea.getText(), storeInventory);
+				} catch (StockException e) {
+					ShowError("Export Manifest Error", e.toString());
+				} catch (DeliveryException e) {
+					ShowError("Export Manifest Error", e.toString());
+				}
+			} else {
+				ShowError("Export Manifest Error", "No file Selected");
 			}
 		}
 		else if (action.getSource() == salesLogButton) {
 			if (salesLogTextArea.getText().trim().length() != 0) {
-
-			} 
+				try {
+					FileManager.LoadSalesLog(salesLogTextArea.getText(), storeInventory, store);
+				
+					int index = 1;
+					for (Item item : storeInventory.getItems()) {
+						inventoryTable.getModel().setValueAt(item.getQuantity(), index, 6);
+						index++;
+					}
+					storeCapitalLabel.setText("$" + store.capitalToString());
+				} catch (CSVFormatException e) {
+					ShowError("Import Sales Log Error", e.toString());
+				}
+				
+			} else {
+				ShowError("Sales Log Error", "No file Selected");
+			}
 		}
 	}
 	
@@ -294,9 +378,12 @@ public class GUI extends JFrame implements ActionListener
 	 * @param args
 	 */
   public static void main(String[] args) {
-
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        new GUI();
+	  store = new Store();
+	  storeInventory = new Stock();
+	  storeNameLabel.setText("Store Name: " + store.getStoreName());
+	  storeCapitalLabel.setText("$" + store.capitalToString());
+	  JFrame.setDefaultLookAndFeelDecorated(true);
+	  new GUI();
     }
   
 	/**
