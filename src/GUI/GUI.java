@@ -39,7 +39,6 @@ public class GUI extends JFrame implements ActionListener
 	public static String salesLogFileName;
 	
 	private static Stock storeInventory;
-	private static Stock itemsToOrder;
 	private static Store store;
 	
 	
@@ -277,16 +276,8 @@ public class GUI extends JFrame implements ActionListener
 				try {
 					FileManager.ImportItemProperties(itemPropertiesTextArea.getText(), storeInventory);
 					// Updates quantity of items in order on Item Properties Import
-					itemsToOrder =  new Stock();
-					for (Item item: storeInventory.getItems()) {
-						if (item.reorder()) {
-							for (int i = 0; i < item.getReorderAmount(); i++) {
-								itemsToOrder.addItem(item);
-							}
-						}
-					}
 					
-					// Updates te table
+					// Updates the table
 					DefaultTableModel dtm = new DefaultTableModel(0, 0);
 					dtm.addColumn("Name");
 					dtm.addColumn("Manufacturing Cost");

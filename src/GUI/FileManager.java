@@ -26,15 +26,15 @@ import Stock.Store;
  */
 public class FileManager {
 	// Variables for testing
-	private static Stock storeInventory;
-	private static Store store;
+	//private static Stock storeInventory;
+	//private static Store store;
 	
 	/**
 	 * Main function used purely for testing.
 	 * Will remove prior to submissions.
 	 * 
 	 * @param args
-	 */
+	 
 	public static void main(String... args)  {
 		
 		storeInventory = new Stock();
@@ -228,6 +228,7 @@ public class FileManager {
 		System.out.println(store.capitalToString());
 		
 	}
+	*/
 		
 	/**
 	 * This method parses a file into a List of Items line by line
@@ -241,15 +242,19 @@ public class FileManager {
 		List<Item> items = new ArrayList<>();
 		
 		Path pathToFile = Paths.get(fileName);
-		
+		// Reads File
 		try (BufferedReader br = Files.newBufferedReader(pathToFile, StandardCharsets.US_ASCII)) {
-			
+			// Goes Line By Line
 			String line = br.readLine();
 			
 			while (line != null) {
+				// Splits contents via , stores in array
 				String[] attributes = line.split(",");
+				// Creates item with array
 				Item item = new Item(attributes);
+				// Adds item to inventory
 				storeInventory.addItem(item);
+				// Goes to next line.
 				line = br.readLine();
 			}
 		} catch (IOException e) {
@@ -275,16 +280,22 @@ public class FileManager {
 			String line = br.readLine();
 			
 			while (line != null) {
+				// Going line by line, splits values into an array at the ,
 				String[] attributes = line.split(",");
+				// Looping through current inventory
 				for (Item item : storeInventory.getItems()) {
+					// Checks if item exists
 					if (item.getName().equals(attributes[0])) {
+						// Increases profit based on item sales
 						for (int i = 0; i < Integer.parseInt(attributes[1]); i++) {
 							profit += item.getSellPrice();
 						}
+						// Updates the quantity.
 						int qty = item.getQuantity() - Integer.parseInt(attributes[1]);
 						item.setQuantity(qty);
 					}
 				}
+				// Goes to next line and repeats loop untill all lines are read
 				line = br.readLine();
 			}
 		} catch (IOException e) {
@@ -325,6 +336,9 @@ public class FileManager {
 			String line = br.readLine();
 			
 			while (line != null) {
+				// Checks the truck type by reading the line in the document
+				// Creates a truck based on that type with an empty cargo.
+				// Sets a boolean variable to try if refrigerated truck
 				if (line.equals(">Refrigerated")) {
 					
 					isColdTruck = true;
@@ -348,9 +362,11 @@ public class FileManager {
 				} else {
 					try {
 						if (isColdTruck) {
+							// Reads through rest of file, spliting file attributes by ,
 							String[] attributes = line.split(",");
 							for (Item item : storeInventory.getItems()) {
 								try { 
+									// Updates inventory of truck that was created and decreases capitol as items are added
 									if (item.getName().equals(attributes[0])) {
 										for (int i = 0; i < Integer.parseInt(attributes[1]); i++) {
 											coldTruck.cargo().addItem(item);
@@ -394,10 +410,12 @@ public class FileManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		// Calculaetes the cost of operating the truck and adds it too the deductions
 		for (Truck truck : incomingFleet) {			
 			deduction += truck.getCost();
 		}
 		
+		// Decreases capital by deduction amount.
 		store.setCapital(store.getCapital() - deduction );
 	}
 	
@@ -413,10 +431,13 @@ public class FileManager {
 	 */
 	public static void ExportManifest(String fileName, Stock storeInventory) throws StockException, DeliveryException {
 		List<Truck> fleet;
+		// Checks to make sure inventory is generated
 		if (storeInventory.getTotal() == 0) {
 			throw new DeliveryException("Error generating manifest : no items in inventory.");
 		} else {
+			// Create a Stock class to store items that need re-ordering.
 			Stock itemsToOrder = new Stock();
+			// Check if items needs inventory need ordering and add to Stock.
 			for (Item item: storeInventory.getItems()) {
 				if (item.reorder()) {
 					for (int i = 0; i < item.getReorderAmount(); i++) {
@@ -424,10 +445,12 @@ public class FileManager {
 					}
 				}
 			}
+			// Create a manifest with list of items that need ordering.
 			Manifest manifest = new Manifest(itemsToOrder);
 			fleet = manifest.getFleet();
 			
 			try {
+				// Write manifest to file
 				FileWriter fileWriter = new FileWriter(fileName);
 				
 				for (Truck truck : fleet) {
