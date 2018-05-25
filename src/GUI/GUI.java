@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,21 +15,18 @@ import Delivery.Manifest;
 import Stock.Item;
 import Stock.Stock;
 import Stock.Store;
+
+
 /**
- *  
+ * The GUI class creates an interface fit to human consumption that visualizes data about the store, loads and generates CSV files
  *@author Alex Holm
  *
  **/
-public class GUI extends JFrame implements Observer, ActionListener
+public class GUI extends JFrame implements ActionListener
 {
 	
-	/**
-	 * I Have no idea what I've done but this is a generated serial 
-	 * instead of a default
-	**/
-	private static final long serialVersionUID = 4465181114406422996L;
-	
-	//Height and Width of the application window
+	private static final long serialVersionUID = 1L;
+
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;
 	
@@ -42,12 +37,12 @@ public class GUI extends JFrame implements Observer, ActionListener
 	JTabbedPane pane = new JTabbedPane();
 	
 	
-	//Store and Inventory Variables
+
     JPanel inventoryTab  = new JPanel();
     private static JLabel storeNameLabel = new JLabel();
     private static JLabel storeCapitalLabel = new JLabel();
     
-    //Names of the columns in the Table 
+
     String[] inventoryColumnNames
     = {"Name", "Cost", "Price", "Reorder Point", "Reorder Amount", "Temperature", "Quantity"};
    //Array of Data for items
@@ -56,14 +51,9 @@ public class GUI extends JFrame implements Observer, ActionListener
     
     JTable inventoryTable = new JTable(data, inventoryColumnNames);
     
-    //Document Variables
     JPanel documentTab = new JPanel();
-    
     ImageIcon folderIcon = new ImageIcon("images/OpenFolder.png", "Open the File Chooser");
-    
-    
-    //Items for the properties section. With A label, text area, a filechooser
-    //icon and buttons
+  
     JLabel itemPropertiesLabel = new JLabel("Item Properties");
     JTextArea itemPropertiesTextArea = new JTextArea(1, 20);
     JFileChooser itemPropertiesChooser = new JFileChooser();
@@ -96,8 +86,10 @@ public class GUI extends JFrame implements Observer, ActionListener
         loadLayout();
 	}
 	
-
-	//this is to initialize components and build the GUI
+	
+	/**
+	 * Initializes and sets up components for the GUI
+	 */
 	private void initComponents() {
 		
 		//Create main frame
@@ -209,9 +201,7 @@ public class GUI extends JFrame implements Observer, ActionListener
 	/*
 	 * 
 	 * This function sets height and width, while also loading the layout. Calling initComponents()
-	 * 
 	 */
-	
 	private void loadLayout() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         initComponents();
@@ -225,7 +215,7 @@ public class GUI extends JFrame implements Observer, ActionListener
 	 * Action Listener. When buttons are clicked, it does things.
 	 * Such as opening FileChoosers, Saving/ Loading data
 	 * Showing errors if the file is not selected or not appropriate
-	 * 
+	 * @param action
 	 */
 	public void actionPerformed(ActionEvent action) {
 		if(action.getSource() == itemPropertiesChooseButton) {
@@ -301,20 +291,18 @@ public class GUI extends JFrame implements Observer, ActionListener
 	
 	/*
 	 * The main function. Creates a store, creates inventory and gets the name and capital
+	 * @param args
 	 */
   public static void main(String[] args) {
 
         JFrame.setDefaultLookAndFeelDecorated(true);
         new GUI();
     }
-
-	@Override
-	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
-		
-	}
-	/*
+  
+	/**
 	 * Used to show errors and display exceptions
+	 * @param title
+	 * @param error
 	 */
 	public void ShowError(String title, String error) {
 		JOptionPane.showMessageDialog(mainFrame,
