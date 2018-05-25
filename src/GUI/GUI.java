@@ -18,7 +18,9 @@ import Stock.Store;
 
 
 /**
- * The GUI class creates an interface fit to human consumption that visualizes data about the store, loads and generates CSV files
+ * The GUI class creates an interface fit to human consumption that visualizes data about the store, 
+ * loads and generates CSV files using the FileManager classs
+ * 
  *@author Alex Holm
  *
  **/
@@ -39,7 +41,6 @@ public class GUI extends JFrame implements ActionListener
 	private static Stock storeInventory;
 	private static Stock itemsToOrder;
 	private static Store store;
-	private static Manifest manifest;
 	
 	
 	
@@ -240,7 +241,6 @@ public class GUI extends JFrame implements ActionListener
 		        
 		      }
 		}
-		//this SAVES a file
 		else if (action.getSource() == exportManifestChooseButton) {
 		      int returnVal = exportManifestChooser.showSaveDialog(GUI.this);
 		      if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -276,7 +276,7 @@ public class GUI extends JFrame implements ActionListener
 			if (itemPropertiesTextArea.getText().trim().length() != 0) {
 				try {
 					FileManager.ImportItemProperties(itemPropertiesTextArea.getText(), storeInventory);
-				
+					// Updates quantity of items in order on Item Properties Import
 					itemsToOrder =  new Stock();
 					for (Item item: storeInventory.getItems()) {
 						if (item.reorder()) {
@@ -286,7 +286,7 @@ public class GUI extends JFrame implements ActionListener
 						}
 					}
 					
-					
+					// Updates te table
 					DefaultTableModel dtm = new DefaultTableModel(0, 0);
 					dtm.addColumn("Name");
 					dtm.addColumn("Manufacturing Cost");
@@ -299,11 +299,18 @@ public class GUI extends JFrame implements ActionListener
 					dtm.addRow(new Object[] {"Name", "Cost", "Price", "Reorder Point", "Reorder Amount", "Temperature", "Quantity"});
 					
 					for (Item item: storeInventory.getItems()) {
-						dtm.addRow(new Object[] { item.getName(), item.getManufacturingCost(), item.getSellPrice(),
+						if (item.getStorageTemp() == 24) {
+							dtm.addRow(new Object[] { item.getName(), item.getManufacturingCost(), item.getSellPrice(),
+									item.getReorderpoint(), item.getReorderAmount(), " ", item.getQuantity() });
+							
+						} else {
+							dtm.addRow(new Object[] { item.getName(), item.getManufacturingCost(), item.getSellPrice(),
 								item.getReorderpoint(), item.getReorderAmount(), item.getStorageTemp(), item.getQuantity() });
+						}
 					}
 					
 					inventoryTable.setModel(dtm);
+					ShowError("Item Properties Imported.", "Please review in store tab.");
 				} catch (IOException e) {
 					ShowError("Import Items Properties Error", e.toString());
 					
@@ -324,13 +331,14 @@ public class GUI extends JFrame implements ActionListener
 			if (importManifestTextArea.getText().trim().length() != 0) {
 				try {
 					FileManager.LoadManifest(importManifestTextArea.getText(), storeInventory, store);
-				
+					// Updates Table based items imported.
 					int index = 1;
 					for (Item item : storeInventory.getItems()) {
 						inventoryTable.getModel().setValueAt(item.getQuantity(), index, 6);
 						index++;
 					}
 					storeCapitalLabel.setText("$" + store.capitalToString());
+					ShowError("Manifest Imported.", "Please review in store tab.");
 				} catch (DeliveryException e) {
 					ShowError("Import Manifest Error", e.toString());
 				}
@@ -343,6 +351,7 @@ public class GUI extends JFrame implements ActionListener
 			if (exportManifestTextArea.getText().trim().length() != 0) {
 			try {
 					FileManager.ExportManifest(exportManifestTextArea.getText(), storeInventory);
+					ShowError("Manifest Exported.", exportManifestTextArea.getText());
 				} catch (StockException e) {
 					ShowError("Export Manifest Error", e.toString());
 				} catch (DeliveryException e) {
@@ -356,13 +365,14 @@ public class GUI extends JFrame implements ActionListener
 			if (salesLogTextArea.getText().trim().length() != 0) {
 				try {
 					FileManager.LoadSalesLog(salesLogTextArea.getText(), storeInventory, store);
-				
+					// Updates table based on Sales Log Imported.
 					int index = 1;
 					for (Item item : storeInventory.getItems()) {
 						inventoryTable.getModel().setValueAt(item.getQuantity(), index, 6);
 						index++;
 					}
 					storeCapitalLabel.setText("$" + store.capitalToString());
+					ShowError("Sales Log Imported", "Please review in store tab.");
 				} catch (CSVFormatException e) {
 					ShowError("Import Sales Log Error", e.toString());
 				}
@@ -387,7 +397,7 @@ public class GUI extends JFrame implements ActionListener
     }
   
 	/**
-	 * Used to show errors and display exceptions
+	 * Used to show errors and display exceptions and successes.
 	 * @param title
 	 * @param error
 	 */
