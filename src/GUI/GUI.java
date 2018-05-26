@@ -273,49 +273,44 @@ public class GUI extends JFrame implements ActionListener
 		} 
 		else if (action.getSource() == itemPropertiesButton) {
 			if (itemPropertiesTextArea.getText().trim().length() != 0) {
-				String path = exportManifestTextArea.getText();
-				if (!path .endsWith(".csv")) {
-					ShowError("Invalid File.", "Select a valid file with .csv extension");
-			 	} else {
-					try {
-						FileManager.ImportItemProperties(itemPropertiesTextArea.getText(), storeInventory);
-						// Updates quantity of items in order on Item Properties Import
-						
-						// Updates the table
-						DefaultTableModel dtm = new DefaultTableModel(0, 0);
-						dtm.addColumn("Name");
-						dtm.addColumn("Manufacturing Cost");
-						dtm.addColumn("Price");
-						dtm.addColumn("Reorder Point");
-						dtm.addColumn("Reorder Amount");
-						dtm.addColumn("Storage Temp");
-						dtm.addColumn("Quantity");
-						
-						dtm.addRow(new Object[] {"Name", "Cost", "Price", "Reorder Point", "Reorder Amount", "Temperature", "Quantity"});
-						
-						for (Item item: storeInventory.getItems()) {
-							if (item.getStorageTemp() == 24) {
-								dtm.addRow(new Object[] { item.getName(), item.getManufacturingCost(), item.getSellPrice(),
-										item.getReorderpoint(), item.getReorderAmount(), " ", item.getQuantity() });
-								
-							} else {
-								dtm.addRow(new Object[] { item.getName(), item.getManufacturingCost(), item.getSellPrice(),
-									item.getReorderpoint(), item.getReorderAmount(), item.getStorageTemp(), item.getQuantity() });
-							}
+				try {
+					FileManager.ImportItemProperties(itemPropertiesTextArea.getText(), storeInventory);
+					// Updates quantity of items in order on Item Properties Import
+					
+					// Updates the table
+					DefaultTableModel dtm = new DefaultTableModel(0, 0);
+					dtm.addColumn("Name");
+					dtm.addColumn("Manufacturing Cost");
+					dtm.addColumn("Price");
+					dtm.addColumn("Reorder Point");
+					dtm.addColumn("Reorder Amount");
+					dtm.addColumn("Storage Temp");
+					dtm.addColumn("Quantity");
+					
+					dtm.addRow(new Object[] {"Name", "Cost", "Price", "Reorder Point", "Reorder Amount", "Temperature", "Quantity"});
+					
+					for (Item item: storeInventory.getItems()) {
+						if (item.getStorageTemp() == 24) {
+							dtm.addRow(new Object[] { item.getName(), item.getManufacturingCost(), item.getSellPrice(),
+									item.getReorderpoint(), item.getReorderAmount(), " ", item.getQuantity() });
+							
+						} else {
+							dtm.addRow(new Object[] { item.getName(), item.getManufacturingCost(), item.getSellPrice(),
+								item.getReorderpoint(), item.getReorderAmount(), item.getStorageTemp(), item.getQuantity() });
 						}
-						
-						inventoryTable.setModel(dtm);
-						ShowError("Item Properties Imported.", "Please review in store tab.");
-					} catch (IOException e) {
-						ShowError("Import Items Properties Error", e.toString());
-						
-					} catch (CSVFormatException e) {
-						ShowError("Import Items Properties Error", e.toString());
-						
-					} catch (StockException e) {
-						ShowError("Import Items Properties Error", e.toString());
 					}
-			 	}
+					
+					inventoryTable.setModel(dtm);
+					ShowError("Item Properties Imported.", "Please review in store tab.");
+				} catch (IOException e) {
+					ShowError("Import Items Properties Error", e.toString());
+					
+				} catch (CSVFormatException e) {
+					ShowError("Import Items Properties Error", e.toString());
+					
+				} catch (StockException e) {
+					ShowError("Import Items Properties Error", e.toString());
+				}
 
 			} else {
 				ShowError("Import Items Properties Error", "No file Selected");
@@ -325,24 +320,19 @@ public class GUI extends JFrame implements ActionListener
 		}
 		else if (action.getSource() == importManifestButton) {
 			if (importManifestTextArea.getText().trim().length() != 0) {
-				String path = exportManifestTextArea.getText();
-				if (!path .endsWith(".csv")) {
-					ShowError("Invalid File.", "Select a valid file with .csv extension");
-			 	} else {
-					try {
-						FileManager.LoadManifest(importManifestTextArea.getText(), storeInventory, store);
-						// Updates Table based items imported.
-						int index = 1;
-						for (Item item : storeInventory.getItems()) {
-							inventoryTable.getModel().setValueAt(item.getQuantity(), index, 6);
-							index++;
-						}
-						storeCapitalLabel.setText("$" + store.capitalToString());
-						ShowError("Manifest Imported.", "Please review in store tab.");
-					} catch (DeliveryException e) {
-						ShowError("Import Manifest Error", e.toString());
+				try {
+					FileManager.LoadManifest(importManifestTextArea.getText(), storeInventory, store);
+					// Updates Table based items imported.
+					int index = 1;
+					for (Item item : storeInventory.getItems()) {
+						inventoryTable.getModel().setValueAt(item.getQuantity(), index, 6);
+						index++;
 					}
-			 	}
+					storeCapitalLabel.setText("$" + store.capitalToString());
+					ShowError("Manifest Imported.", "Please review in store tab.");
+				} catch (DeliveryException e) {
+					ShowError("Import Manifest Error", e.toString());
+				}
 			} else {
 				ShowError("Import Manifest Error", "No file Selected");
 			}
@@ -350,6 +340,7 @@ public class GUI extends JFrame implements ActionListener
 		}
 		else if (action.getSource() == exportManifestButton) {
 			if (exportManifestTextArea.getText().trim().length() != 0) {
+<<<<<<< HEAD
 				String path = exportManifestTextArea.getText();
 				if (!path .endsWith(".csv")) {
 					path += ".csv";
@@ -363,30 +354,35 @@ public class GUI extends JFrame implements ActionListener
 							ShowError("Export Manifest Error", e.toString());
 						}
 			 	}
+=======
+			try {
+					FileManager.ExportManifest(exportManifestTextArea.getText(), storeInventory);
+					ShowError("Manifest Exported.", exportManifestTextArea.getText());
+				} catch (StockException e) {
+					ShowError("Export Manifest Error", e.toString());
+				} catch (DeliveryException e) {
+					ShowError("Export Manifest Error", e.toString());
+				}
+>>>>>>> parent of 293ca63... .CSV File checking
 			} else {
 				ShowError("Export Manifest Error", "No file Selected");
 			}
 		}
 		else if (action.getSource() == salesLogButton) {
 			if (salesLogTextArea.getText().trim().length() != 0) {
-				String path = exportManifestTextArea.getText();
-				if (!path .endsWith(".csv")) {
-					ShowError("Invalid File.", "Select a valid file with .csv extension");
-			 	} else {
-					try {
-						FileManager.LoadSalesLog(salesLogTextArea.getText(), storeInventory, store);
-						// Updates table based on Sales Log Imported.
-						int index = 1;
-						for (Item item : storeInventory.getItems()) {
-							inventoryTable.getModel().setValueAt(item.getQuantity(), index, 6);
-							index++;
-						}
-						storeCapitalLabel.setText("$" + store.capitalToString());
-						ShowError("Sales Log Imported", "Please review in store tab.");
-					} catch (CSVFormatException e) {
-						ShowError("Import Sales Log Error", e.toString());
-					} 
-			 	}
+				try {
+					FileManager.LoadSalesLog(salesLogTextArea.getText(), storeInventory, store);
+					// Updates table based on Sales Log Imported.
+					int index = 1;
+					for (Item item : storeInventory.getItems()) {
+						inventoryTable.getModel().setValueAt(item.getQuantity(), index, 6);
+						index++;
+					}
+					storeCapitalLabel.setText("$" + store.capitalToString());
+					ShowError("Sales Log Imported", "Please review in store tab.");
+				} catch (CSVFormatException e) {
+					ShowError("Import Sales Log Error", e.toString());
+				}
 				
 			} else {
 				ShowError("Sales Log Error", "No file Selected");
