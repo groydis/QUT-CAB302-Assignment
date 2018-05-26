@@ -340,13 +340,21 @@ public class GUI extends JFrame implements ActionListener
 		}
 		else if (action.getSource() == exportManifestButton) {
 			if (exportManifestTextArea.getText().trim().length() != 0) {
-<<<<<<< HEAD
+
 				String path = exportManifestTextArea.getText();
 				if (!path .endsWith(".csv")) {
 					path += ".csv";
+					try {
+						FileManager.ExportManifest(path, storeInventory);
+						ShowError("Manifest Exported.", exportManifestTextArea.getText());
+					} catch (StockException e) {
+						ShowError("Export Manifest Error", e.toString());
+					} catch (DeliveryException e) {
+						ShowError("Export Manifest Error", e.toString());
+					}
 			 	} else {
 					try {
-							FileManager.ExportManifest(path, storeInventory);
+						FileManager.ExportManifest(path, storeInventory);
 							ShowError("Manifest Exported.", exportManifestTextArea.getText());
 						} catch (StockException e) {
 							ShowError("Export Manifest Error", e.toString());
@@ -354,16 +362,7 @@ public class GUI extends JFrame implements ActionListener
 							ShowError("Export Manifest Error", e.toString());
 						}
 			 	}
-=======
-			try {
-					FileManager.ExportManifest(exportManifestTextArea.getText(), storeInventory);
-					ShowError("Manifest Exported.", exportManifestTextArea.getText());
-				} catch (StockException e) {
-					ShowError("Export Manifest Error", e.toString());
-				} catch (DeliveryException e) {
-					ShowError("Export Manifest Error", e.toString());
-				}
->>>>>>> parent of 293ca63... .CSV File checking
+
 			} else {
 				ShowError("Export Manifest Error", "No file Selected");
 			}
