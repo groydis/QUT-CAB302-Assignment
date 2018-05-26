@@ -362,9 +362,9 @@ public class GUI extends JFrame implements ActionListener
 						} catch (DeliveryException e) {
 							ShowError("Export Manifest Error", e.toString());
 						}
-					} else {
-						ShowError("Export Manifest Error", "No file Selected");
-					}
+			 	}
+			} else {
+				ShowError("Export Manifest Error", "No file Selected");
 			}
 		}
 		else if (action.getSource() == salesLogButton) {
